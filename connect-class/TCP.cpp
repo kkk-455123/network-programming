@@ -7,26 +7,51 @@ TcpServer::~TcpServer() {
 	if (m_clientfd != 0) close(m_clientfd);
 }
 
-bool 
+//bool 
+//TcpServer::InitServer(const int port) {
+//	if((m_listenfd = socket(AF_INET, SOCK_STREAM, 0)) <= 0) return false;
+//	make_nonblocking(m_listenfd);  // 把监听套接字设置为非阻塞
+//
+//	m_serverAddr.sin_family = AF_INET;
+//	m_serverAddr.sin_addr.s_addr = htonl(INADDR_ANY);
+//	m_serverAddr.sin_port = htons(port);
+//	if (bind(m_listenfd, (struct sockaddr*)&m_serverAddr, sizeof(m_serverAddr)) != 0) {
+//		close(m_listenfd);
+//		m_listenfd = 0;
+//		return false;
+//	}
+//
+//	if (listen(m_listenfd, 5) != 0) {
+//		close(m_listenfd);
+//		m_listenfd = 0;
+//		return false;
+//	}
+//
+//	return true;
+//}
+
+int 
 TcpServer::InitServer(const int port) {
-	if((m_listenfd = socket(AF_INET, SOCK_STREAM, 0)) <= 0) return false;
+	m_listenfd = socket(AF_INET, SOCK_STREAM, 0);
+	make_nonblocking(m_listenfd);  // 把监听套接字设置为非阻塞
 
 	m_serverAddr.sin_family = AF_INET;
 	m_serverAddr.sin_addr.s_addr = htonl(INADDR_ANY);
 	m_serverAddr.sin_port = htons(port);
-	if (bind(m_listenfd, (struct sockaddr*)&m_serverAddr, sizeof(m_serverAddr)) != 0) {
-		close(m_listenfd);
-		m_listenfd = 0;
-		return false;
-	}
 
-	if (listen(m_listenfd, 5) != 0) {
-		close(m_listenfd);
-		m_listenfd = 0;
-		return false;
-	}
+	// 允许端口重用，以便服务端程序在极短的时间内重启时可以复用同一个端口
+	int on = 1;
+	setsockopt(m_listenfd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on));  // SO_REUSEADDR选项
 
-	return true;
+	int rt1 = bind(m_listenfd, (struct sockaddr*)&m_serverAddr, sizeof(m_serverAddr));
+	if (rt1 < 0) { perror("bind failed"); }
+
+	int rt2 = listen(m_listenfd, 5);
+	if (rt2 < 0) { perror("listen failed"); }
+
+	signal(SIGPIPE, SIG_IGN);  // 对一个对端已经关闭的socket调用两次write, 第二次将会生成SIGPIPE信号, 该信号默认结束进程。为了避免进程退出，重新设置该信号处理方法，忽略
+
+	return m_listenfd;
 }
 
 bool
@@ -91,4 +116,8 @@ TcpClient::Send(const void* const buf, const int buflen) {
 int
 TcpClient::Recv(void* const buf, const int buflen) {
 	return recv(m_sockfd, buf, buflen, 0);
+}
+
+void make_nonblocking(int fd) {
+	fcntl(fd, F_SETFL, O_NONBLOCK);
 }

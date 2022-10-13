@@ -8,6 +8,7 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <csignal>
+#include <fcntl.h>
 
 #include <iostream>
 #include <string>
@@ -17,8 +18,10 @@ class TcpServer
 public:
 	TcpServer();
 	
-	bool InitServer(const int port);  // 初始化服务器
-	bool Accept();  // 等待客户端连接
+	//bool InitServer(const int port);  // 初始化服务器
+	int InitServer(const int port);  // 初始化服务器，并返回监听套接字
+	//bool Accept();  // 等待客户端连接
+	int Accept();  // 等待客户端连接，返回连接套接字
 
 	int Send(const void* const buf, const int buflen);  // 发送报文
 	int Recv(void* const buf, const int buflen);  // 接收报文
@@ -50,3 +53,6 @@ private:
 	int m_sockfd;
 	struct sockaddr_in m_servAddr;
 };
+
+// 设置非阻塞
+void make_nonblocking(int);
