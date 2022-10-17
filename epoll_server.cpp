@@ -46,29 +46,29 @@ int main() {
 				int socket_fd = event_fd;
 				std::cout << "get event on socket fd == " << socket << std::endl;
 				// 接收数据
-				while (1) {
-					char buf[512];
-					// 读数据出错
-					if ((n = read(socket_fd, buf, sizeof(buf))) < 0) {
-						if (errno != EAGAIN) {
-							perror("read error");
-							close(socket_fd);
-						}
-						break;
-					}
-					// 客户端正常关闭, 关闭连接套接字 
-					else if (n == 0) {
-						close(socket_fd);
-						break;
-					}
-					// 数据处理逻辑and发送数据
-					else {
-						for (int i = 0; i < n; i++) {
-							buf[i] = CharChange(buf[i]);
-						}
-						if (write(socket_fd, buf, n) < 0) perror("write error");
-					}
-				}
+				//while (1) {
+				//	char buf[512];
+				//	// 读数据出错
+				//	if ((n = read(socket_fd, buf, sizeof(buf))) < 0) {
+				//		if (errno != EAGAIN) {
+				//			perror("read error");
+				//			close(socket_fd);
+				//		}
+				//		break;
+				//	}
+				//	// 客户端正常关闭, 关闭连接套接字 
+				//	else if (n == 0) {
+				//		close(socket_fd);
+				//		break;
+				//	}
+				//	// 数据处理逻辑and发送数据
+				//	else {
+				//		for (int i = 0; i < n; i++) {
+				//			buf[i] = CharChange(buf[i]);
+				//		}
+				//		if (write(socket_fd, buf, n) < 0) perror("write error");
+				//	}
+				//}
 			}
 			
 		}
