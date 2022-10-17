@@ -21,7 +21,7 @@ public:
 	//bool InitServer(const int port);  // 初始化服务器
 	int InitServer(const int port);  // 初始化服务器，并返回监听套接字
 	//bool Accept();  // 等待客户端连接
-	int Accept();  // 等待客户端连接，返回连接套接字
+	int Accept(int listenfd);  // 等待客户端连接，返回连接套接字
 
 	int Send(const void* const buf, const int buflen);  // 发送报文
 	int Recv(void* const buf, const int buflen);  // 接收报文

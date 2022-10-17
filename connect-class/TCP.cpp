@@ -54,11 +54,18 @@ TcpServer::InitServer(const int port) {
 	return m_listenfd;
 }
 
-bool
-TcpServer::Accept() {
-	m_clientfd = accept(m_listenfd, NULL, NULL);
-	if (m_clientfd <= 0) { perror("accept"); return false;  }
-	return true;
+//bool
+//TcpServer::Accept() {
+//	m_clientfd = accept(m_listenfd, NULL, NULL);
+//	if (m_clientfd <= 0) { perror("accept"); return false;  }
+//	return true;
+//}
+
+int
+TcpServer::Accept(int listenfd) {
+	int fd = accept(listenfd, NULL, NULL);
+	if (fd < 0) perror("accept failed");
+	return fd;
 }
 
 int
