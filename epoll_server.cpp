@@ -1,3 +1,9 @@
+/*
+echo server
+using epoll
+using TCP.h and epoller.h
+*/
+
 #include <iostream>
 #include "./connect-class/TCP.h"
 #include "./event_dispatcher/epoller.h"
@@ -25,7 +31,7 @@ int main() {
 			std::cout << "start processing event:" << i << std::endl;
 			int event_fd = epoller.GetEventFd(i);
 			uint32_t event_event = epoller.GetEvent(i);
-			// errorÊÂ¼þ
+			// erroräº‹ä»¶
 			if ((event_event & EPOLLERR)
 				|| (event_event & EPOLLHUP)
 				|| (!(event_event & EPOLLIN))) {
@@ -34,23 +40,23 @@ int main() {
 				continue;
 			}
 
-			// ÊÂ¼þÀ´×Ôlistenfd
+			// äº‹ä»¶æ¥è‡ªlistenfd
 			else if (listenfd == event_fd) {
-				int clientfd = server.Accept(listenfd);  // »ñÈ¡Á¬½ÓÌ×½Ó×Ö
-				make_nonblocking(clientfd);  // ÉèÖÃ·Ç×èÈû
-				epoller.AddFd(clientfd, EPOLLIN | EPOLLET);  // ½«Á¬½ÓÌ×½Ó×Ö¼ÓÈë¼à²â
+				int clientfd = server.Accept(listenfd);  // èŽ·å–è¿žæŽ¥å¥—æŽ¥å­—
+				make_nonblocking(clientfd);  // è®¾ç½®éžé˜»å¡ž
+				epoller.AddFd(clientfd, EPOLLIN | EPOLLET);  // å°†è¿žæŽ¥å¥—æŽ¥å­—åŠ å…¥ç›‘æµ‹
 				continue;
 			}
 
-			// ÊÂ¼þÀ´×Ô¿Í»§¶Ë
+			// äº‹ä»¶æ¥è‡ªå®¢æˆ·ç«¯
 			else {
 				int socket_fd = event_fd;
 				std::cout << "get event on socket fd == " << socket << std::endl;
-				// ½ÓÊÕÊý¾Ý
+				// æŽ¥æ”¶æ•°æ®
 				while (1) {
 					char buf[512];
 					int n_read = read(socket_fd, buf, sizeof(buf));
-					// ¶ÁÊý¾Ý³ö´í
+					// è¯»æ•°æ®å‡ºé”™
 					if (n_read < 0) {
 						if (errno != EAGAIN) {
 							perror("read error");
@@ -58,13 +64,13 @@ int main() {
 						}
 						break;
 					}
-					// ¿Í»§¶ËÕý³£¹Ø±Õ, ¹Ø±ÕÁ¬½ÓÌ×½Ó×Ö 
+					// å®¢æˆ·ç«¯æ­£å¸¸å…³é—­, å…³é—­è¿žæŽ¥å¥—æŽ¥å­— 
 					else if (n_read == 0) {
 						std::cout << "close normally." << std::endl;
 						close(socket_fd);
 						break;
 					}
-					// Êý¾Ý´¦ÀíÂß¼­and·¢ËÍÊý¾Ý
+					// æ•°æ®å¤„ç†é€»è¾‘andå‘é€æ•°æ®
 					else {
 						if (write(socket_fd, buf, n_read) < 0) perror("write error");
 						std::cout << "send finish." << std::endl;
