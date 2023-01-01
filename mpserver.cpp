@@ -1,22 +1,28 @@
+/*
+echo server
+using the multi-process network model
+using TCP.h
+*/
+
 #include "TCP.h"
 using namespace std;
 
 int main()
 {
-	signal(SIGCHLD, SIG_IGN);  // ºöÂÔ×Ó½ø³ÌÍË³öĞÅºÅ£¬±íÊ¾¸¸½ø³Ì²»¹ØĞÄ£¬½«Æä½»ÓÉinit½ø³Ì¹ÜÀí
+	signal(SIGCHLD, SIG_IGN);  // å¿½ç•¥å­è¿›ç¨‹é€€å‡ºä¿¡å·ï¼Œè¡¨ç¤ºçˆ¶è¿›ç¨‹ä¸å…³å¿ƒï¼Œå°†å…¶äº¤ç”±initè¿›ç¨‹ç®¡ç†
 	TcpServer server;
 
 	if (server.InitServer(21567) == false) { cout << "Init failed,exit..." << endl; return -1; }
 	while (true) {
 		if (server.Accept() == false) { cout << "Accept failed,exit..." << endl; continue; }
-		if (fork() > 0) { // ´´½¨×Ó½ø³Ì
-			server.CloseClient();  // ¸¸½ø³Ì¹Ø±ÕÓÃÓÚÍ¨ĞÅµÄsocket
-			continue;  // ¸¸½ø³Ì¼ÌĞø¼àÌı
+		if (fork() > 0) { // åˆ›å»ºå­è¿›ç¨‹
+			server.CloseClient();  // çˆ¶è¿›ç¨‹å…³é—­ç”¨äºé€šä¿¡çš„socket
+			continue;  // çˆ¶è¿›ç¨‹ç»§ç»­ç›‘å¬
 		}
 		
-		// ×Ó½ø³Ì¼ÌĞøÖ´ĞĞ³ÌĞò
+		// å­è¿›ç¨‹ç»§ç»­æ‰§è¡Œç¨‹åº
 		{
-			server.CloseListen();  // ×Ó½ø³Ì²»ĞèÒªÓÃÓÚ¼àÌıµÄsocket
+			server.CloseListen();  // å­è¿›ç¨‹ä¸éœ€è¦ç”¨äºç›‘å¬çš„socket
 			cout << "Connected client" << getpid() << endl;
 
 			const int BufSize = 1024;
@@ -33,7 +39,7 @@ int main()
 			}
 
 			cout << "Disconnected client" << getpid() << endl;
-			exit(0);  // ÍË³öµ±Ç°½ø³Ì
+			exit(0);  // é€€å‡ºå½“å‰è¿›ç¨‹
 		}
 	}
 }
