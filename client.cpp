@@ -1,3 +1,7 @@
+/*
+using native socket
+*/
+
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
@@ -16,16 +20,16 @@ int main(int argc, char* argv[])
 		return -1;
 	}
 
-	// 1.´´½¨¿Í»§¶Ësocket
+	// 1.åˆ›å»ºå®¢æˆ·ç«¯socket
 	int sockfd;
 	if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
 		cerr << "socket error" << endl;
 		return -1;
 	}
 
-	// 2.Ïò·þÎñÆ÷·¢ÆðÁ¬½ÓÇëÇó
+	// 2.å‘æœåŠ¡å™¨å‘èµ·è¿žæŽ¥è¯·æ±‚
 	struct hostent* h;
-	if ((h = gethostbyname(argv[1])) == 0) {  // Ê¶±ðipµØÖ·»òÓòÃû¶¼¿ÉÒÔ
+	if ((h = gethostbyname(argv[1])) == 0) {  // è¯†åˆ«ipåœ°å€æˆ–åŸŸåéƒ½å¯ä»¥
 		cerr << "gethostbyname failed" << endl;
 		close(sockfd);
 		return -1;
@@ -35,7 +39,7 @@ int main(int argc, char* argv[])
 	memset(&servaddr, 0, sizeof(servaddr));
 	servaddr.sin_family = AF_INET;
 	servaddr.sin_port = htons(atoi(argv[2]));
-	//servaddr.sin_addr.s_addr = inet_addr(argv[1]);  // Ê¹ÓÃÕâÖÖ·½Ê½ÎÞ·¨ÓÃÓòÃû£¬Ö»ÄÜÓÃipµØÖ·
+	//servaddr.sin_addr.s_addr = inet_addr(argv[1]);  // ä½¿ç”¨è¿™ç§æ–¹å¼æ— æ³•ç”¨åŸŸåï¼Œåªèƒ½ç”¨ipåœ°å€
 	memcpy(&servaddr.sin_addr, h->h_addr, h->h_length);
 	if (connect(sockfd, (struct sockaddr*)&servaddr, sizeof(servaddr)) != 0) {
 		cerr << "connect error" << endl;
@@ -43,7 +47,7 @@ int main(int argc, char* argv[])
 		return -1;
 	}
 
-	// 3.Óë·þÎñÆ÷Í¨ÐÅ£¬·¢ËÍ±¨ÎÄ£¬ÊÕµ½»Ø¸´ºóÔÙ·¢ÏÂÒ»¸ö±¨ÎÄ
+	// 3.ä¸ŽæœåŠ¡å™¨é€šä¿¡ï¼Œå‘é€æŠ¥æ–‡ï¼Œæ”¶åˆ°å›žå¤åŽå†å‘ä¸‹ä¸€ä¸ªæŠ¥æ–‡
 	char buffer[1024];
 	while(true)
 	{
@@ -51,16 +55,16 @@ int main(int argc, char* argv[])
 		memset(buffer, 0, sizeof(buffer));
 		
 		string sendMessage;
-		getline(cin, sendMessage);  // Ö±½ÓÓÃcin»áÌø¹ý¿Õ¸ñ£¬Ôì³Éhow are you±»·Ö³ÉÈý²¿·Ö·Ö±ðËÍÈë¼üÅÌ»º´æÇø
+		getline(cin, sendMessage);  // ç›´æŽ¥ç”¨cinä¼šè·³è¿‡ç©ºæ ¼ï¼Œé€ æˆhow are youè¢«åˆ†æˆä¸‰éƒ¨åˆ†åˆ†åˆ«é€å…¥é”®ç›˜ç¼“å­˜åŒº
 		strcpy(buffer, sendMessage.c_str());
 		//sprintf(buffer, "how are you");
 
-		// µ÷ÓÃÒ»´Îsend
+		// è°ƒç”¨ä¸€æ¬¡send
 		if ((iret = send(sockfd, buffer, strlen(buffer), 0)) <= 0) {
 			cerr << "send error" << endl;
 			break;
 		}
-		// µ÷ÓÃ¶à´Îsend
+		// è°ƒç”¨å¤šæ¬¡send
 		//int count = 0;
 		//while (count < sendMessage.size())
 		//{
@@ -84,6 +88,6 @@ int main(int argc, char* argv[])
 		cout << "Receive" << iret << ":" << buffer << endl;
 	}
 
-	// 4.¹Ø±Õsocket£¬ÊÍ·Å×ÊÔ´
+	// 4.å…³é—­socketï¼Œé‡Šæ”¾èµ„æº
 	close(sockfd);
 }
