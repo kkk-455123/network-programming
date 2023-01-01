@@ -1,4 +1,5 @@
 /*
+echo server
 basic socket网络模型，一对一通信
 使用自己封装的socket连接类
 */
