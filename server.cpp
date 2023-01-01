@@ -1,3 +1,9 @@
+/*
+echo server
+using basic socket network model
+using native socket
+*/
+
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
@@ -18,43 +24,43 @@ int main(int argc, char* argv[])
 		return -1;
 	}
 
-	// 1.´´½¨·şÎñ¶Ësocket
+	// 1.åˆ›å»ºæœåŠ¡ç«¯socket
 	int listenfd;
-	if ( (listenfd = socket(AF_INET, SOCK_STREAM, 0)) == -1) {  // ¸³Öµ·ûºÅÓÅÏÈ¼¶×îµÍ£¬×¢Òâ¸ø¸³Öµ±í´ïÊ½¼ÓÀ¨ºÅ
+	if ( (listenfd = socket(AF_INET, SOCK_STREAM, 0)) == -1) {  // èµ‹å€¼ç¬¦å·ä¼˜å…ˆçº§æœ€ä½ï¼Œæ³¨æ„ç»™èµ‹å€¼è¡¨è¾¾å¼åŠ æ‹¬å·
 		std::cerr << "socket error" << std::endl;
 		return -1;
 	}
 
-	// 2.°ó¶¨·şÎñ¶ËipµØÖ·ºÍ¶Ë¿Ú
+	// 2.ç»‘å®šæœåŠ¡ç«¯ipåœ°å€å’Œç«¯å£
 	struct sockaddr_in servaddr;
 	memset(&servaddr, 0, sizeof(servaddr));
-	servaddr.sin_family = AF_INET;  // Ğ­Òé×å
-	servaddr.sin_addr.s_addr = htonl(INADDR_ANY);  // Ö¸¶¨Ö÷»úÉÏµÄÈÎÒâipµØÖ·
-	servaddr.sin_port = htons(atoi(argv[1]));  // Í¨ĞÅ¶Ë¿Ú
+	servaddr.sin_family = AF_INET;  // åè®®æ—
+	servaddr.sin_addr.s_addr = htonl(INADDR_ANY);  // æŒ‡å®šä¸»æœºä¸Šçš„ä»»æ„ipåœ°å€
+	servaddr.sin_port = htons(atoi(argv[1]));  // é€šä¿¡ç«¯å£
 	if(bind(listenfd, (struct sockaddr*)&servaddr, sizeof(servaddr)) != 0) {
 		perror("bind");
 		//std::cerr << "bind error" << std::endl;
-		//std::cerr << "error:" << strerror(errno) << std::endl;  // »ñÈ¡´íÎóĞÅÏ¢
+		//std::cerr << "error:" << strerror(errno) << std::endl;  // è·å–é”™è¯¯ä¿¡æ¯
 		return -1;
 	}
 
-	// 3.ÉèÖÃsocketÎª¼àÌıÄ£Ê½
-	// listenfd socketÖ»¸ºÔğ¼àÌı£¬²»¸ºÔğºÍ¿Í»§¶ËÍ¨ĞÅ
+	// 3.è®¾ç½®socketä¸ºç›‘å¬æ¨¡å¼
+	// listenfd socketåªè´Ÿè´£ç›‘å¬ï¼Œä¸è´Ÿè´£å’Œå®¢æˆ·ç«¯é€šä¿¡
 	if (listen(listenfd, 5) != 0) { 
 		perror("listen");
 		close(listenfd);
 		return -1;
 	}
 
-	// 4.½ÓÊÜ¿Í»§¶ËÁ¬½Ó
-	int clientfd;  // ¿Í»§¶Ësocket
+	// 4.æ¥å—å®¢æˆ·ç«¯è¿æ¥
+	int clientfd;  // å®¢æˆ·ç«¯socket
 	int socklen = sizeof(struct sockaddr_in);
 	struct sockaddr_in clientaddr;
-	// ´ÓÒÑ×¼±¸ºÃµÄÁ¬½Ó¶ÓÁĞÖĞ»ñÈ¡Ò»¸öÇëÇó£¬Èô¶ÓÁĞÎª¿Õ»á×èÈûµÈ´ı
-	clientfd = accept(listenfd, (struct sockaddr*)&clientaddr, (socklen_t*)&socklen);  // Èç¹û²»ĞèÒªÖªµÀ¿Í»§¶Ëip£¬ºóÁ½¸ö²ÎÊı¿ÉÒÔÎªnull
+	// ä»å·²å‡†å¤‡å¥½çš„è¿æ¥é˜Ÿåˆ—ä¸­è·å–ä¸€ä¸ªè¯·æ±‚ï¼Œè‹¥é˜Ÿåˆ—ä¸ºç©ºä¼šé˜»å¡ç­‰å¾…
+	clientfd = accept(listenfd, (struct sockaddr*)&clientaddr, (socklen_t*)&socklen);  // å¦‚æœä¸éœ€è¦çŸ¥é“å®¢æˆ·ç«¯ipï¼Œåä¸¤ä¸ªå‚æ•°å¯ä»¥ä¸ºnull
 	std::cout << "Client" << inet_ntoa(clientaddr.sin_addr) << "has connected" << std::endl;
 	
-	// 5.½ÓÊÕ¿Í»§¶Ë·¢ËÍµÄ±¨ÎÄ
+	// 5.æ¥æ”¶å®¢æˆ·ç«¯å‘é€çš„æŠ¥æ–‡
 	char buffer[1024];
 	while (true)
 	{
@@ -81,7 +87,7 @@ int main(int argc, char* argv[])
 		std::cout << "Send" << iret << ":" << buffer << std::endl;
 	}
 
-	// 6.¹Ø±Õsocket ÊÍ·Å×ÊÔ´
+	// 6.å…³é—­socket é‡Šæ”¾èµ„æº
 	close(listenfd);
 	close(clientfd);
 }
